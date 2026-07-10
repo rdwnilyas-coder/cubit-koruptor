@@ -76,8 +76,8 @@ taruh file dengan nama yang benar.
 - Kecepatan wave: `speedMul` di `loop()`.
 - Koruptor awal per wave = nomor wave (`nKoruptor = G.wave` di `updateWave()`).
 
-## Status repo / rencana
+## Status repo
 
-- Sudah ada initial commit (`b3108a7`), `.DS_Store` sudah di `.gitignore`, tapi BELUM ada remote.
-- Rencana upload: GitHub akun **rdwnilyas-coder**, nama repo **`cubit-koruptor`** (repo belum dibuat).
+- Remote: https://github.com/rdwnilyas-coder/cubit-koruptor (branch `main`).
+- Live via GitHub Pages: https://rdwnilyas-coder.github.io/cubit-koruptor/ (auto-deploy tiap push ke `main`).
 - Rename "Sentil" → "Cubit": commit awal & sebagian komentar masih pakai istilah "sentil"/`doFlick()`.
