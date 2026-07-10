@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentil Koruptor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-wrap">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <span id="wave">Wave 1</span>
+    <span id="score">Skor: 0</span>
+    <span id="waktu">0:00</span>
+    <span id="korup">Koruptor: 0</span>
+    <span id="nyawa">❤️❤️❤️</span>
+  </div>
+
+  <div id="cam-box">
+    <video id="cam" playsinline muted></video>
+    <canvas id="cam-overlay"></canvas>
+    <div id="cam-status">Kamera mati</div>
+  </div>
+
+  <div id="wave-banner" hidden></div>
+
+  <div id="overlay">
+    <div id="panel">
+      <h1>🫰 SENTIL KORUPTOR</h1>
+      <p id="panel-text">
+        Polisi, tentara, dan jaksa berkeliaran di taman.<br>
+        Yang bawa <b>karung uang</b> itu <b>KORUPTOR</b> — dan korupsi itu menular lewat sentuhan!<br><br>
+        Gerakkan <b>telunjuk</b> di depan kamera untuk mengarahkan jari,<br>
+        lalu <b>cubit</b> (jempol + telunjuk) saat koruptor ada di dalam lingkaran!<br><br>
+        Bersihkan semua koruptor untuk lanjut ke wave berikutnya.<br>
+        Salah cubit aparat bersih = kehilangan 1 nyawa ❤️ (hanya ada 3).<br>
+        <b>Kalah</b> jika nyawa habis atau SEMUA karakter menjadi koruptor.
+      </p>
+      <p id="panel-score" hidden></p>
+      <button id="btn-start">Mulai Main</button>
+      <p class="hint">Butuh izin kamera. Fallback: gerakkan mouse &amp; klik untuk menyentil.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
