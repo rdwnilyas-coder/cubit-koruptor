@@ -321,7 +321,15 @@ const G = {
 };
 resize();
 
-function startGame() {
+async function startGame() {
+  // tunggu izin kamera diperbolehkan ATAU ditolak dulu, baru mulai
+  if (!camStarted) {
+    btnStart.disabled = true;
+    btnStart.textContent = 'Menunggu izin kamera…';
+    await initCamera();
+    btnStart.disabled = false;
+    btnStart.textContent = 'Main Lagi';
+  }
   G.running = true;
   G.chars = [];
   G.particles = [];
@@ -331,7 +339,6 @@ function startGame() {
   G.wave = 0;
   overlay.classList.add('hidden');
   nextWave();
-  if (!camStarted) initCamera();
 }
 
 function nextWave() {
@@ -454,7 +461,7 @@ function initCamera() {
   camStarted = true;
   if (typeof Hands === 'undefined') {
     document.getElementById('cam-status').textContent = 'MediaPipe gagal dimuat — pakai mouse';
-    return;
+    return Promise.resolve();
   }
   const hands = new Hands({
     locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`,
@@ -471,7 +478,7 @@ function initCamera() {
     width: 320,
     height: 240,
   });
-  cam.start().then(() => camBox.classList.add('on'))
+  return cam.start().then(() => camBox.classList.add('on'))
     .catch(() => { document.getElementById('cam-status').textContent = 'Kamera ditolak — pakai mouse'; });
 }
 
