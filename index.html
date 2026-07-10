@@ -8,21 +8,22 @@
 </head>
 <body>
 <div id="game-wrap">
+  <div id="sidebar">
+    <div id="cam-box">
+      <video id="cam" playsinline muted></video>
+      <canvas id="cam-overlay"></canvas>
+      <div id="cam-status">Kamera mati</div>
+    </div>
+    <div id="hud">
+      <span id="wave">Wave 1</span>
+      <span id="score">Skor: 0</span>
+      <span id="waktu">0:00</span>
+      <span id="korup">Koruptor: 0</span>
+      <span id="nyawa">❤️❤️❤️</span>
+    </div>
+  </div>
+
   <canvas id="game"></canvas>
-
-  <div id="hud">
-    <span id="wave">Wave 1</span>
-    <span id="score">Skor: 0</span>
-    <span id="waktu">0:00</span>
-    <span id="korup">Koruptor: 0</span>
-    <span id="nyawa">❤️❤️❤️</span>
-  </div>
-
-  <div id="cam-box">
-    <video id="cam" playsinline muted></video>
-    <canvas id="cam-overlay"></canvas>
-    <div id="cam-status">Kamera mati</div>
-  </div>
 
   <div id="wave-banner" hidden></div>
 

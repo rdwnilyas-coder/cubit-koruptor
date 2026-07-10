@@ -70,8 +70,8 @@ const THEMES = [
 
 let bg = null;
 function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
   bg = drawPark(canvas.width, canvas.height, G.wave);
 }
 function drawPark(w, h, wave) {
@@ -447,7 +447,8 @@ function doFlick() {
 // Fallback mouse (untuk testing tanpa kamera)
 canvas.addEventListener('mousemove', e => {
   if (handActive) return; // deteksi tangan lebih prioritas
-  cursor.tx = e.clientX; cursor.ty = e.clientY; cursor.visible = true;
+  const r = canvas.getBoundingClientRect();
+  cursor.tx = e.clientX - r.left; cursor.ty = e.clientY - r.top; cursor.visible = true;
 });
 canvas.addEventListener('mousedown', () => { if (!handActive) doFlick(); });
 

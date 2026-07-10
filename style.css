@@ -10,21 +10,32 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  display: flex;
+}
+
+#sidebar {
+  flex: none;
+  width: 196px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px;
+  background: #10200f;
+  overflow-y: auto;
 }
 
 #game {
   display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 100%;
   cursor: none;
 }
 
 #hud {
-  position: absolute;
-  top: 12px;
-  left: 12px;
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
   font-size: 20px;
   font-weight: 700;
   color: #fff;
@@ -54,10 +65,9 @@ body {
 }
 
 #cam-box {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 200px;
+  position: relative;
+  flex: none;
+  width: 100%;
   border: 3px solid #fff;
   border-radius: 10px;
   overflow: hidden;
@@ -68,6 +78,8 @@ body {
 #cam {
   display: block;
   width: 100%;
+  aspect-ratio: 4 / 3; /* tinggi tetap sebelum video jalan, bar tidak melompat */
+  object-fit: cover;
   transform: scaleX(-1); /* mirror */
 }
 
