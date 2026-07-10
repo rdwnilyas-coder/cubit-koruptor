@@ -467,7 +467,7 @@ function initCamera() {
     locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`,
   });
   hands.setOptions({
-    maxNumHands: 1,
+    maxNumHands: 2, // 1 bikin deteksi berat sebelah (tangan kanan sering tak terdeteksi)
     modelComplexity: 0,
     minDetectionConfidence: 0.6,
     minTrackingConfidence: 0.5,
@@ -498,7 +498,16 @@ function onHands(res) {
   handLostTimer = 0;
   handActive = true;
   cursor.visible = true;
-  const lm = res.multiHandLandmarks[0];
+  // kalau dua tangan terlihat, pakai yang paling dekat kursor sebelumnya biar tidak lompat
+  let lm = res.multiHandLandmarks[0];
+  if (res.multiHandLandmarks.length > 1) {
+    const px = 1 - cursor.tx / canvas.width, py = cursor.ty / canvas.height;
+    let best = Infinity;
+    for (const cand of res.multiHandLandmarks) {
+      const d = Math.hypot(cand[8].x - px, cand[8].y - py);
+      if (d < best) { best = d; lm = cand; }
+    }
+  }
 
   // ---- gerakan: telunjuk (8) → posisi kursor arena, mirror horizontal ----
   cursor.tx = (1 - lm[8].x) * canvas.width;
