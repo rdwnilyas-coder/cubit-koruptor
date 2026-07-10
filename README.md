@@ -42,6 +42,11 @@ Lihat karung uangnya 💰 — itu tanda mereka sudah tertular korupsi.
 - 🌗 Ada **5 wave**, petanya makin mencekam: taman cerah → mendung → senja → malam mencekam → malam berdarah. Musiknya pun makin gelap tiap wave 🎵.
 - 🏆 **Menang:** bersihkan kelima wave. **Kalah:** nyawa habis, atau semua karakter keburu jadi koruptor.
 
+## 🌐 Jalankan Online
+
+Langsung main tanpa install apa pun: **https://rdwnilyas-coder.github.io/cubit-koruptor/**
+— buka di browser, izinkan kamera, dan mulai mencubit!
+
 ## 🖥️ Jalankan Lokal
 
 Kamera butuh `localhost` atau HTTPS:
@@ -59,4 +64,4 @@ python3 -m http.server 8765
 
 ---
 
-*created by [@rdwnilyas](https://github.com/rdwnilyas-coder)* 🤏💰
+*created by [@rdwnilyas](https://www.instagram.com/rdwnilyas)* 🤏💰
