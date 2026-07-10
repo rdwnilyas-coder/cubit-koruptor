@@ -1,5 +1,5 @@
 // ============================================================
-// SENTIL KORUPTOR — engine utama
+// CUBIT KORUPTOR — engine utama
 // Aset gambar opsional di ./assets/ ; fallback: emoji.
 // ============================================================
 'use strict';
@@ -23,6 +23,7 @@ const waveBanner = document.getElementById('wave-banner');
 
 const CHAR_SIZE = 64;         // ukuran gambar karakter (px)
 const HIT_RADIUS = 70;        // radius sentilan
+const MAX_WAVE = 5;           // 5 wave, bersihkan semuanya = menang
 const TYPES = ['polisi', 'tentara', 'jaksa'];
 const EMOJI = { polisi: '👮', tentara: '💂', jaksa: '🧑‍⚖️', pengusaha: '👨‍💼' };
 
@@ -38,21 +39,56 @@ for (const name of IMG_NAMES) {
 }
 
 // ---------- Kanvas & background taman ----------
+// Tema peta per wave: makin tinggi wave makin mencekam.
+const THEMES = [
+  { nama: 'TAMAN CERAH', grass: ['#7ec850', '#559b38'], path: '#d9c68f',
+    water: ['#6db3d8', '#8fcbe8'],
+    deco: ['🌳', '🌳', '🌴', '🌲', '🌳', '⛲', '🪑', '🌷', '🌻', '🌼',
+      '🪨', '🍄', '🌲', '🌳', '🛝', '🪑', '💐', '🌴', '🦆', '⛲'],
+    tint: null },
+  { nama: 'MENDUNG KELABU', grass: ['#6da457', '#47713a'], path: '#b8ab8a',
+    water: ['#5f8fa8', '#7aa3b5'],
+    deco: ['🌳', '🌫️', '🌴', '🌲', '🌳', '⛲', '🪑', '🌾', '🍂', '🐦',
+      '🪨', '🍄', '🌲', '🌳', '🌫️', '🪑', '🍂', '🌴', '🐦', '⛲'],
+    tint: 'rgba(80,90,110,.18)' },
+  { nama: 'SENJA KELAM', grass: ['#9a8a4a', '#4d5a2a'], path: '#a8906a',
+    water: ['#4a7a96', '#618d9f'],
+    deco: ['🌳', '🍂', '🌴', '🌲', '🌳', '⛲', '🪑', '🥀', '🍂', '🦉',
+      '🪨', '🍄', '🌲', '🌳', '🕯️', '🪑', '🍂', '🌴', '🦇', '⛲'],
+    tint: 'rgba(140,60,30,.22)' },
+  { nama: 'MALAM MENCEKAM', grass: ['#31473a', '#16241c'], path: '#4a4a55',
+    water: ['#1e3346', '#2b4256'],
+    deco: ['🌲', '🪦', '🌲', '🦇', '🕸️', '⛲', '🪦', '🥀', '🦉', '🕷️',
+      '🪨', '💀', '🌲', '🕸️', '🪦', '🦇', '🥀', '🌲', '🦇', '🌫️'],
+    tint: 'rgba(5,8,35,.42)', moon: '🌕', fog: 'rgba(200,200,220,.08)' },
+  { nama: 'MALAM BERDARAH', grass: ['#3d2430', '#180c14'], path: '#553844',
+    water: ['#3a1a24', '#4a2430'],
+    deco: ['🌲', '⚰️', '💀', '🦇', '🕸️', '🔥', '🪦', '🥀', '💀', '🕷️',
+      '🪦', '💀', '🌲', '🕸️', '⚰️', '🦇', '🔥', '🪦', '🦇', '🌑'],
+    tint: 'rgba(60,0,10,.45)', moon: '🔴', fog: 'rgba(120,0,20,.12)' },
+];
+
 let bg = null;
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  bg = drawPark(canvas.width, canvas.height);
+  bg = drawPark(canvas.width, canvas.height, G.wave);
 }
-function drawPark(w, h) {
+function drawPark(w, h, wave) {
+  const t = THEMES[Math.min(Math.max(wave, 1), MAX_WAVE) - 1];
   const off = document.createElement('canvas');
   off.width = w; off.height = h;
   const c = off.getContext('2d');
-  if (IMGS.background) { c.drawImage(IMGS.background, 0, 0, w, h); return off; }
+  if (IMGS.background) {
+    c.drawImage(IMGS.background, 0, 0, w, h);
+    if (t.tint) { c.fillStyle = t.tint; c.fillRect(0, 0, w, h); }
+    drawCredit(c, w, h);
+    return off;
+  }
   // rumput bergradasi
   const grad = c.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, '#7ec850');
-  grad.addColorStop(1, '#559b38');
+  grad.addColorStop(0, t.grass[0]);
+  grad.addColorStop(1, t.grass[1]);
   c.fillStyle = grad;
   c.fillRect(0, 0, w, h);
   // petak rumput lebih gelap (variasi tekstur)
@@ -65,7 +101,7 @@ function drawPark(w, h) {
     c.fill();
   }
   // dua jalan setapak menyilang
-  c.strokeStyle = '#d9c68f';
+  c.strokeStyle = t.path;
   c.lineWidth = 70;
   c.lineCap = 'round';
   c.beginPath();
@@ -78,30 +114,53 @@ function drawPark(w, h) {
   c.bezierCurveTo(w * 0.45, h * 0.4, w * 0.25, h * 0.7, w * 0.4, h + 30);
   c.stroke();
   // kolam + air mancur
-  c.fillStyle = '#6db3d8';
+  c.fillStyle = t.water[0];
   c.beginPath(); c.ellipse(w * 0.8, h * 0.2, 95, 58, 0, 0, Math.PI * 2); c.fill();
-  c.fillStyle = '#8fcbe8';
+  c.fillStyle = t.water[1];
   c.beginPath(); c.ellipse(w * 0.8, h * 0.2, 60, 35, 0, 0, Math.PI * 2); c.fill();
   // kolam kecil kedua
-  c.fillStyle = '#6db3d8';
+  c.fillStyle = t.water[0];
   c.beginPath(); c.ellipse(w * 0.12, h * 0.85, 65, 38, 0, 0, Math.PI * 2); c.fill();
   // dekorasi emoji (posisi deterministik)
   c.textBaseline = 'middle'; c.textAlign = 'center';
-  const deco = ['🌳', '🌳', '🌴', '🌲', '🌳', '⛲', '🪑', '🌷', '🌻', '🌼',
-    '🪨', '🍄', '🌲', '🌳', '🛝', '🪑', '💐', '🌴', '🦆', '⛲'];
+  const deco = t.deco;
   for (let i = 0; i < deco.length; i++) {
     const x = ((i * 137 + 61) % 100) / 100 * w;
     const y = ((i * 83 + 29) % 100) / 100 * h;
     c.font = `${34 + (i % 4) * 12}px serif`;
     c.fillText(deco[i], x, y);
   }
-  // bebek di kolam
-  c.font = '24px serif';
-  c.fillText('🦆', w * 0.82, h * 0.21);
+  // bebek di kolam (wave 3: kolam sunyi)
+  if (!t.moon) {
+    c.font = '24px serif';
+    c.fillText('🦆', w * 0.82, h * 0.21);
+  }
+  // semburat tema (senja/malam) di atas segalanya
+  if (t.tint) { c.fillStyle = t.tint; c.fillRect(0, 0, w, h); }
+  // bulan + kabut malam
+  if (t.moon) {
+    c.font = '70px serif';
+    c.fillText(t.moon, w * 0.9, h * 0.1);
+    c.fillStyle = t.fog;
+    for (let i = 0; i < 5; i++) {
+      c.beginPath();
+      c.ellipse(((i * 211 + 89) % 100) / 100 * w, h * (0.55 + i * 0.09), w * 0.35, 26, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+  }
+  drawCredit(c, w, h);
   return off;
 }
+// marker kreator di pojok kanan-bawah peta
+function drawCredit(c, w, h) {
+  c.font = '14px sans-serif';
+  c.textAlign = 'right';
+  c.textBaseline = 'bottom';
+  c.fillStyle = 'rgba(255,255,255,.55)';
+  c.fillText('created by @rdwnilyas', w - 12, h - 10);
+}
 window.addEventListener('resize', resize);
-resize();
+// resize() awal dipanggil setelah G dideklarasikan (butuh G.wave)
 
 // ---------- Audio (blip sederhana via WebAudio) ----------
 let audioCtx = null;
@@ -120,6 +179,43 @@ function sfxSalah() { beep(140, 0.25, 'sawtooth'); }
 function sfxInfeksi() { beep(330, 0.1, 'sawtooth', 0.12); setTimeout(() => beep(220, 0.18, 'sawtooth', 0.12), 90); }
 function sfxWave() { beep(523, 0.12, 'triangle'); setTimeout(() => beep(659, 0.12, 'triangle'), 130); setTimeout(() => beep(784, 0.2, 'triangle'), 260); }
 function sfxKalah() { beep(300, 0.3, 'sawtooth'); setTimeout(() => beep(220, 0.3, 'sawtooth'), 300); setTimeout(() => beep(150, 0.6, 'sawtooth'), 600); }
+
+// ---------- Musik latar (sequencer WebAudio, loop, beda tiap wave) ----------
+// mel/bass = 16 langkah not-1/8 (Hz, 0 = diam), makin tinggi wave makin mencekam.
+const MUSIC = [
+  { bpm: 132, type: 'triangle', // wave 1: ceria mayor
+    mel: [523, 0, 659, 0, 784, 0, 659, 0, 880, 0, 784, 0, 659, 0, 587, 0],
+    bass: [131, 0, 0, 0, 196, 0, 0, 0, 131, 0, 0, 0, 196, 0, 0, 0] },
+  { bpm: 116, type: 'triangle', // wave 2: minor murung
+    mel: [440, 0, 523, 0, 494, 0, 440, 0, 415, 0, 440, 0, 330, 0, 0, 0],
+    bass: [110, 0, 0, 0, 165, 0, 0, 0, 110, 0, 0, 0, 155, 0, 0, 0] },
+  { bpm: 104, type: 'sawtooth', // wave 3: senja suram
+    mel: [330, 0, 392, 0, 370, 0, 330, 0, 294, 0, 311, 0, 247, 0, 0, 0],
+    bass: [82, 0, 0, 0, 123, 0, 0, 0, 82, 0, 0, 0, 117, 0, 0, 0] },
+  { bpm: 92, type: 'square', // wave 4: malam, jarang + tritone
+    mel: [262, 0, 0, 0, 370, 0, 0, 0, 262, 0, 0, 0, 247, 0, 233, 0],
+    bass: [65, 0, 0, 0, 0, 0, 92, 0, 65, 0, 0, 0, 0, 0, 62, 0] },
+  { bpm: 150, type: 'sawtooth', // wave 5: cepat & disonan
+    mel: [220, 233, 220, 0, 220, 233, 262, 0, 220, 233, 220, 0, 196, 0, 175, 0],
+    bass: [55, 55, 0, 55, 55, 0, 55, 55, 58, 58, 0, 58, 58, 0, 62, 62] },
+];
+let musicTimer = null;
+function playMusic(wave) {
+  stopMusic();
+  const m = MUSIC[Math.min(Math.max(wave, 1), MAX_WAVE) - 1];
+  const stepDur = 60 / m.bpm / 2; // not 1/8
+  let step = 0;
+  musicTimer = setInterval(() => {
+    const mel = m.mel[step % 16];
+    if (mel) beep(mel, stepDur * 0.9, m.type, 0.04);
+    const bass = m.bass[step % 16];
+    if (bass) beep(bass, stepDur * 1.8, 'triangle', 0.07);
+    step++;
+  }, stepDur * 1000);
+}
+function stopMusic() {
+  if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+}
 
 // ---------- Entitas ----------
 class Character {
@@ -175,11 +271,14 @@ class Character {
         c.fillText('💰', this.x + CHAR_SIZE * 0.35, this.y + bobY + CHAR_SIZE * 0.2);
       }
     }
-    if (this.corrupt) { // tanda seru merah biar jelas
-      c.font = 'bold 20px sans-serif';
-      c.fillStyle = '#e53935';
+    if (this.corrupt) { // tanda seru merah besar biar jelas
+      c.font = 'bold 38px sans-serif';
       c.textAlign = 'center';
-      c.fillText('!', this.x, this.y + bobY - CHAR_SIZE * 0.62);
+      c.strokeStyle = '#fff';
+      c.lineWidth = 5;
+      c.strokeText('!', this.x, this.y + bobY - CHAR_SIZE * 0.75);
+      c.fillStyle = '#e53935';
+      c.fillText('!', this.x, this.y + bobY - CHAR_SIZE * 0.75);
     }
   }
 }
@@ -220,6 +319,7 @@ const G = {
   waveTimer: 0,
   koruptorsSpawned: false,
 };
+resize();
 
 function startGame() {
   G.running = true;
@@ -239,14 +339,16 @@ function nextWave() {
   G.waveState = 'banner';
   G.waveTimer = 2;
   G.koruptorsSpawned = false;
+  bg = drawPark(canvas.width, canvas.height, G.wave); // peta baru tiap wave
   // tambah warga bersih baru (yang selamat dari wave lalu tetap ada)
   const nBaru = 4 + G.wave * 2;
   for (let i = 0; i < nBaru && G.chars.length < 60; i++) {
     G.chars.push(new Character(TYPES[Math.floor(Math.random() * 3)], false));
   }
-  waveBanner.textContent = `🌊 WAVE ${G.wave}`;
+  waveBanner.textContent = `🌊 WAVE ${G.wave} — ${THEMES[G.wave - 1].nama}`;
   waveBanner.hidden = false;
   sfxWave();
+  playMusic(G.wave);
 }
 
 function updateWave(dt) {
@@ -256,7 +358,7 @@ function updateWave(dt) {
       waveBanner.hidden = true;
       G.waveState = 'playing';
       // lepas koruptor: pengusaha korup, makin tinggi wave makin banyak
-      const nKoruptor = 1 + Math.floor(G.wave / 2);
+      const nKoruptor = G.wave; // wave 1→1, 2→2, 3→3
       for (let i = 0; i < nKoruptor; i++) {
         G.chars.push(new Character('pengusaha', true));
       }
@@ -267,7 +369,13 @@ function updateWave(dt) {
   }
   if (G.waveState === 'cleared') {
     G.waveTimer -= dt;
-    if (G.waveTimer <= 0) nextWave();
+    if (G.waveTimer <= 0) {
+      if (G.wave >= MAX_WAVE) {
+        gameOver('🏆 <b>TAMAN BERSIH DARI KORUPSI!</b><br>Kelima wave berhasil kamu bersihkan. Kamu MENANG!', true);
+      } else {
+        nextWave();
+      }
+    }
     return;
   }
   // wave selesai jika semua koruptor sudah disentil
@@ -280,16 +388,17 @@ function updateWave(dt) {
   }
 }
 
-function gameOver(msg) {
+function gameOver(msg, menang) {
   G.running = false;
   G.waveState = 'idle';
   waveBanner.hidden = true;
+  stopMusic();
   panelText.innerHTML = msg;
   panelScore.hidden = false;
-  panelScore.textContent = `Skor: ${G.score} koruptor disentil — sampai Wave ${G.wave} — waktu ${fmtTime(G.time)}`;
+  panelScore.textContent = `Skor: ${G.score} koruptor dicubit — sampai Wave ${G.wave} — waktu ${fmtTime(G.time)}`;
   btnStart.textContent = 'Main Lagi';
   overlay.classList.remove('hidden');
-  sfxKalah();
+  if (menang) sfxWave(); else sfxKalah();
 }
 
 function fmtTime(t) {
@@ -320,7 +429,7 @@ function doFlick() {
         G.lives--;
         flashRed = 0.25;
         sfxSalah();
-        if (G.lives <= 0) gameOver('💔 <b>NYAWA HABIS!</b><br>Terlalu banyak salah sentil aparat bersih...');
+        if (G.lives <= 0) gameOver('💔 <b>NYAWA HABIS!</b><br>Terlalu banyak salah cubit aparat bersih...');
       }
       break; // satu sentilan = satu target
     }
@@ -446,11 +555,11 @@ function loop(now) {
   if (G.running) {
     G.time += dt;
     updateWave(dt);
-    const speedMul = 1 + (G.wave - 1) * 0.12 + G.time / 240; // makin lama makin cepat
+    const speedMul = 1 + (G.wave - 1) * 0.25 + G.time / 240; // makin lama makin cepat
     for (const ch of G.chars) ch.update(dt, speedMul);
     updateInfection();
     const nKorup = G.chars.filter(c => c.corrupt).length;
-    elWave.textContent = `Wave ${G.wave}`;
+    elWave.textContent = `Wave ${G.wave}/${MAX_WAVE}`;
     elScore.textContent = `Skor: ${G.score}`;
     elWaktu.textContent = fmtTime(G.time);
     elKorup.textContent = `Koruptor: ${nKorup}`;
