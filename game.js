@@ -483,8 +483,8 @@ function initCamera() {
   });
   hands.setOptions({
     maxNumHands: 2, // 1 bikin deteksi berat sebelah (tangan kanan sering tak terdeteksi)
-    modelComplexity: 0,
-    minDetectionConfidence: 0.6,
+    modelComplexity: 1, // model lite (0) sering gagal mendeteksi tangan kanan
+    minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5,
   });
   hands.onResults(onHands);

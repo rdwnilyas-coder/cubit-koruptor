@@ -60,7 +60,8 @@ taruh file dengan nama yang benar.
 
 ## Deteksi tangan (game.js)
 
-- MediaPipe Hands, `maxNumHands:1`, `modelComplexity:0` (kecepatan > akurasi).
+- MediaPipe Hands, `maxNumHands:2` + `modelComplexity:1` (mode 1 tangan / model lite
+  gagal mendeteksi tangan kanan); kalau 2 tangan terlihat, dipakai yang terdekat kursor.
 - Kursor = landmark 8 (ujung telunjuk), di-mirror horizontal, di-lerp biar halus.
 - Cubit = rasio jarak jempol(4)–telunjuk(8) dibagi ukuran telapak (0–9):
   turun < 0.35 → `doFlick()` langsung; harus naik > 0.6 dulu sebelum bisa cubit lagi.
