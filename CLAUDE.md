@@ -22,7 +22,8 @@ Tanpa kamera, game tetap bisa dites: gerakkan mouse + klik = cubit.
 
 ## Struktur
 
-- `index.html` — layout: sidebar kiri (preview kamera di atas, HUD vertikal di bawahnya) + canvas game di kanan, overlay menu.
+- `index.html` — layout: canvas game layar penuh, HUD vertikal kiri atas, preview kamera besar
+  di pojok kiri bawah (karakter memantul di `camZone`, tidak bisa masuk ke belakang kamera), overlay menu.
 - `style.css` — semua styling.
 - `game.js` — seluruh engine dalam satu file: asset loader, tema peta per wave, entitas, wave, MediaPipe, SFX + musik latar (WebAudio, tanpa file audio).
 - `assets/` — gambar PNG opsional (transparan). Kalau tidak ada, game pakai emoji sebagai placeholder.

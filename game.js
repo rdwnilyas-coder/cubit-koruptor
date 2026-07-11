@@ -69,9 +69,12 @@ const THEMES = [
 ];
 
 let bg = null;
+let camZone = { x: 0, y: 0, w: 0, h: 0 }; // area kamera di pojok kiri bawah — karakter memantul di sini
 function resize() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
+  const cr = camBox.getBoundingClientRect(), gr = canvas.getBoundingClientRect();
+  camZone = { x: cr.left - gr.left, y: cr.top - gr.top, w: cr.width, h: cr.height };
   bg = drawPark(canvas.width, canvas.height, G.wave);
 }
 function drawPark(w, h, wave) {
@@ -222,8 +225,11 @@ class Character {
   constructor(type, corrupt) {
     this.type = type;
     this.corrupt = corrupt;
-    this.x = Math.random() * (canvas.width - 120) + 60;
-    this.y = Math.random() * (canvas.height - 120) + 60;
+    do { // jangan spawn di dalam zona kamera
+      this.x = Math.random() * (canvas.width - 120) + 60;
+      this.y = Math.random() * (canvas.height - 120) + 60;
+    } while (camZone.w && this.x > camZone.x - 30 && this.x < camZone.x + camZone.w + 30 &&
+             this.y > camZone.y - 30 && this.y < camZone.y + camZone.h + 30);
     this.speed = 40 + Math.random() * 40;
     this.dir = Math.random() * Math.PI * 2;
     this.turnTimer = 0;
@@ -244,6 +250,14 @@ class Character {
     if (this.x > canvas.width - m) { this.x = canvas.width - m; this.dir = Math.PI - this.dir; }
     if (this.y < m) { this.y = m; this.dir = -this.dir; }
     if (this.y > canvas.height - m) { this.y = canvas.height - m; this.dir = -this.dir; }
+    // pantul di zona kamera (pojok kiri bawah) — keluar lewat sisi kanan atau atas zona
+    const z = camZone;
+    if (z.w && this.x + m > z.x && this.x - m < z.x + z.w && this.y + m > z.y && this.y - m < z.y + z.h) {
+      const exitR = (z.x + z.w + m) - this.x;
+      const exitU = this.y - (z.y - m);
+      if (exitR < exitU) { this.x = z.x + z.w + m; this.dir = Math.PI - this.dir; }
+      else { this.y = z.y - m; this.dir = -this.dir; }
+    }
     this.bob += dt * 10;
   }
   draw(c) {
